@@ -23,6 +23,7 @@ class User(models.Model):
 
 class Blog(models.Model):
 
+    user= models.ForeignKey('User',on_delete=models.CASCADE)
     email=models.CharField(max_length=100,default="")
     title=models.CharField(max_length=100,default="")
     content=models.CharField(max_length=500,default="")
@@ -34,5 +35,19 @@ class Blog(models.Model):
     def __str__(self):
         return '%s %s'(self.content,self.title)
 
+class Comment(models.Model):
+
+    post = models.ForeignKey('Blog',on_delete=models.CASCADE)
+    text = models.TextField()
+    author = models.CharField(max_length=100)
+
+    def __str__(self):
+        return "[%s] %s" % (self.author, self.text)
+
 class Like(models.Model):
-    number_of_likes=models.
+    user = models.ForeignKey('User',on_delete=models.CASCADE)
+    content = models.ForeignKey(Blog)
+    timestamp = models.DateTimeField()
+
+    def __str__(self):
+        return '%s %s'(self.User.username)

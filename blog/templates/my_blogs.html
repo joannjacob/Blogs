@@ -5,13 +5,22 @@
     <title>Title</title>
 </head>
 <body>
-<ul>
+<table align="center">
 
     {% for item in myblogs %}
-    <li>
-        {{item.title}}-{{item.content}}
-    </li>
+    <br>
+    <tr>
+        {% url = "/blog_details/" + str(item.id) + '/' %}
+        <!--<th><label>Title</label></th>-->
+        <th><a href="' + url + '">{{item.title}} </a></th>
+    </tr>
+    <!--<tr>
+        <th><label>Content</label></th>
+        <th><textarea rows="4" cols="50">{{item.content}}</textarea></th>
+    </tr>-->
+    <br>
+    <br>
     {% endfor %}
-</ul>
+</table>
 </body>
 </html>

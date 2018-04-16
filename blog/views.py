@@ -1,17 +1,20 @@
 from django.shortcuts import render,redirect
 from django.views.generic import TemplateView
 from django.template import loader
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
-from .models import User,Blog
+from .models import User,Blog,Like,Comment
+
+from . import serializers
+from .models import User, Blog, Comment
+from .serializers import UserSerializer, BlogSerializer, CommentSerializer
+from rest_framework import generics
 from rest_framework import viewsets
-from .models import User, Blog
-from .serializers import UserSerializer, BlogSerializer
-
-
-
-
+from rest_framework.permissions import AllowAny
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -21,6 +24,22 @@ class UserViewSet(viewsets.ModelViewSet):
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [AllowAny]
+    queryset = Comment.objects.all()
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 
 
 def home(request):
@@ -71,7 +90,7 @@ def add_signup(request):
             return render(request,'signup.html')
 
 def add_blog(request):
-    return render(request,'add_blog.html')
+      return render(request,'add_blog.html')
 
 
 
@@ -89,14 +108,47 @@ def add_blogentry(request):
             return render(request,'fail.html')
 
 def my_blogs(request):
-    emailid=request.session['emailid']
-    myblogs=Blog.objects.filter(email=emailid)
-    return render(request,'my_blogs.html',{'myblogs':myblogs})
+    all_contents = Blog.objects.filter(email=request.session['emailid'])
+    html = ''
+    for content in all_contents:
+        url = "/my_blogs/" + str(content.id) + '/'
+        html += '<a href="' + url + '">' + content.content + '</a><br>'
+    return HttpResponse(html)
+
+
+'''class MyBlogs(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'my_blogs.html'
+
+    def get(self, request):
+        queryset = Blog.objects.filter(email=request.session['emailid'])
+        serializer_class = BlogSerializer
+        return Response({'myblogs':queryset})
+    
 
 def all_blogs(request):
 
     myblogs=Blog.objects.all()
     return render(request,'my_blogs.html',{'myblogs':myblogs})
+'''
+
+def all_blogs(request):
+    all_contents = Blog.objects.all()
+    html = ''
+    for content in all_contents:
+        url = "/all_blogs/" + str(content.id) + '/'
+        html += '<a href="' + url + '">' + content.content + '</a><br>'
+    return HttpResponse(html)
+
+def detail(request,content_id):
+    #return HttpResponse("<h2>Details: "+ str(content_id) +"</h2>")
+    try:
+        all_contents=Blog.objects.get(id=content_id)
+    except Blog.DoesNotExist:
+        raise Http404("Blog doesnt exist")
+    return render(request, 'all_blogs.html', {'all_blogs': all_contents})
+
+
 
 def enter_login(request):
     if request.method == 'POST':
@@ -146,6 +198,26 @@ def password_change(request):
             return render(request, 'login.html')
         else:
             return render(request,'update_password.html')
+
+
+
+def like_button_clicked(request, blog_id):
+
+    if request.user.is_authenticated():
+        blog = Blog.objects.get(id=blog_id)
+
+        liked, created = Like.objects.get_or_create(
+            user=request.user,
+            blog=blog,
+            defaults={'timestamp': datetime.now()}
+        )
+
+        if not created:
+            liked.delete()
+
+        return render(request, 'success.html')
+    else:
+        return render(request, 'fail.html')
 
 
 
