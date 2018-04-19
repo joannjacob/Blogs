@@ -6,5 +6,55 @@
 </head>
 <body>
 
+<table align="center">
+<form action="myblog_editupdate" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+    <br>
+    <tr>
+        <th><label>Content</label></th>
+        <th><textarea rows="4" cols="50" contenteditable="true" name="edittedblog">{{all_blogs.content}}</textarea></th>
+    </tr>
+    <tr>
+        <th colspan="2"><button type="submit">Edit </button> </th>
+    </tr>
+</form>
+    <tr>
+        <th>
+            {% if flag %}
+                <a href="#" style="color:red"> Liked </a>
+            {% else %}
+                <a href="like" > Like </a>
+            {% endif %}
+        </th>
+        <th><button type="submit">Add Tags</button> </th>
+    </tr>
+    <tr>
+        <br>
+        <table align="center">
+            <form action="add_comment" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <th>
+                    <th>POST A COMMENT</th>
+                    <th><textarea name="comment"></textarea></th>
+                <th colspan="2"><button type="submit">Add Comment</button></th>
+                </tr>
+            </form>
+        </table>
+    </tr>
+    <tr>
+        <table align="center">
+            {% for item in all_comments %}
+            <tr>
+                <th></th>
+                <th><label>{{item.comment}}</label></th>
+            </tr>
+            {% endfor %}
+        </table>
+    </tr>
+
+
+</table>
 </body>
 </html>

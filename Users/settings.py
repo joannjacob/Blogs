@@ -42,6 +42,8 @@ INSTALLED_APPS = [
 
 ]
 
+LOGIN_REDIRECT_URL='/home/'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -57,7 +59,7 @@ ROOT_URLCONF = 'Users.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,7 +81,7 @@ WSGI_APPLICATION = 'Users.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'User',
+        'NAME': 'FinalProject',
         'USER': 'root',
         'PASSWORD': 'ubuntu',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
@@ -126,3 +128,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+

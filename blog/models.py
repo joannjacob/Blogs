@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 
-class User(models.Model):
+class Users(models.Model):
 
     firstname=models.CharField(max_length=100,default="")
     lastname=models.CharField(max_length=100,default="")
@@ -13,41 +13,43 @@ class User(models.Model):
     security_question=models.CharField(max_length=100,default="")
     security_answer = models.CharField(max_length=100, default="")
 
+    def __str__(self):
+        return self.username
+
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
 
-    def __str__(self):
-        return '%s %s %s %s'%(self.username,self.password,
-                              self.security_question,self.security_answer)
+
 
 class Blog(models.Model):
 
-    user= models.ForeignKey('User',on_delete=models.CASCADE)
-    email=models.CharField(max_length=100,default="")
+    user=models.ForeignKey('auth.User', on_delete=models.CASCADE)
     title=models.CharField(max_length=100,default="")
-    content=models.CharField(max_length=500,default="")
+    content=models.CharField(max_length=100,default="")
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         verbose_name = "Blog"
         verbose_name_plural = "Blogs"
 
-    def __str__(self):
-        return '%s %s'(self.content,self.title)
+
 
 class Comment(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE,default="")
+    blog = models.ForeignKey('Blog',on_delete=models.CASCADE)
+    comment = models.TextField(max_length=500,default="")
 
-    post = models.ForeignKey('Blog',on_delete=models.CASCADE)
-    text = models.TextField()
-    author = models.CharField(max_length=100)
 
     def __str__(self):
-        return "[%s] %s" % (self.author, self.text)
+        return self.comment
 
 class Like(models.Model):
-    user = models.ForeignKey('User',on_delete=models.CASCADE)
-    content = models.ForeignKey(Blog)
-    timestamp = models.DateTimeField()
+    user = models.ForeignKey('auth.User',on_delete=models.CASCADE,default="")
+    blog = models.ForeignKey('Blog',on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s %s'(self.User.username)
+        return self.user
+

@@ -10,19 +10,49 @@
     <br>
     <tr>
         <th><label>Content</label></th>
-        <th><textarea rows="4" cols="50" contenteditable="true">{{all_blogs.content}}</textarea></th>
+        <th><textarea rows="4" cols="50" contenteditable="false">{{all_blogs.content}}</textarea></th>
     </tr>
     <tr>
-        <th><button type="submit"><img src="/images/index.jpeg"/> Like </button></th>
-
-        <th><button type="submit">Comment</button> </th>
+        <th>
+            {% if flag %}
+                <a href="#" style="color:red"> Liked </a>
+            {% else %}
+                <a href="like" > Like </a>
+            {% endif %}
+        </th>
         <th><button type="submit">Add Tags</button> </th>
+
     </tr>
-    <br>
     <tr>
-        <th colspan="2"><button type="submit">Submit</button> </th>
+        <br>
+        <table align="center">
+            <form action="add_comment" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <th>
+                    <th>POST A COMMENT</th>
+                    <th><textarea name="comment"></textarea></th>
+                <th colspan="2"><button type="submit">Add Comment</button></th>
+                </tr>
+            </form>
+        </table>
     </tr>
-    <br>
+    <tr>
+        <table align="center">
+            {% for item in all_comments %}
+            <tr>
+                <th></th>
+                <th></th>
+                <th>{{item.comment}}</th>
+            </tr>
+            {% endfor %}
+        </table>
+
+
+    </tr>
+
+
+
     <br>
 
 </table>
